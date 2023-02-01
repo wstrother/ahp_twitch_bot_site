@@ -162,6 +162,58 @@ because of the way they can be combined and used to invoke each other. We'll sta
 
 The simplest use case, this type of command simply causes your bot to say something to the chat whenever it is invoked.
 
+#### FormatCommand
+
+```json
+["FormatCommand", "name", "Formatted text with {variable_interploation}"]
+```
+
+Similar to the TextCommand class, these except they support a type of variable interpolation based on the specification in Python's
+**str.format()** string method. The variable set passed to this formatting method comes from the bot's state variable set
+and they can be interpolated by the string by enclosing the variable name in curly brackets like this: * '{variable_name}'*.
+
+Note that these variable names can also support key or index specifications within square brackets, i.e.: *'{variable[subkey]}'*.
+
+Python's string formatting method also supports some additional formatting arguments as specified [here](https://docs.python.org/3/library/string.html#format-specification-mini-language).
+This provides support for padding, alignment, and some numeric conversion. Bear in mind, that in the source code's implementation
+the formatting method is called with the state variables passed as named keywords, so the FormatCommand class itself doesn't
+support the use of positional arguments.
+
+#### JsonCommand
+
+```json
+["JsonCommand", "name", {"some_key": "some value that can be {variable_interpolated}"}]
+```
+
+The JsonCommand class takes a third parameter that should be a JSON object rather than a string. The intended use for this
+CommandClass is to be able to create a JSON formatted string that can then be passed to a PostCommand to make up the body of its post request.
+
+They value for each key within the JSON object can also be interpolated with state variables, just like the FormatCommand class.
+This formatting is performed recursively so strings within nested objects will also be interpolated.
+
+
+#### PostCommand
+
+```json
+["PostCommand", "name", "url"]
+```
+
+The PostCommand is used to send a POST request to an API endpoint specified by the URL parameter.
+
+Note that when the PostCommand is invoked in chat, the argument passed to it must be a valid JSON serializable string, which is treated as
+the body of the POST request. Because this is error prone and unwieldy, it's reccomended that the PostCommand be used in conjunction 
+with other commands, typically a JsonCommand in order to provide a properly fromatted JSON serializable string.
+
+#### GetCommand
+
+```json
+["PostCommand", "name", "url"]
+```
+
+Similar to the PostCommand, the GetCommand sends a GET an API endpoint specified by the URL parameter and echos its output to chat.
+
+Because most web APIs return data as serialized JSON, it might be more useful to chain this command with other commands, just like the PostCommand.
+
 
 #### AliasCommand
 
@@ -172,6 +224,41 @@ The simplest use case, this type of command simply causes your bot to say someth
 These commands do not take any arguments. Instead they invoke some other command with a specified set of arguments passed to it. 
 They are useful for creating a shorthand for a common command/argument pairs such as typing *"!ssb"* to invoke *"!game Super Smash Bros."*.
 
+#### StateCommand
+
+```python
+["StateCommand", "name", (optional)"key"]
+```
+
+These commands set some 'state variable' of the bot. By default, the name of the command is used as the name for the state variable,
+ but the optional third parameter can be specified so that the command's name is different from the name of the state variable.
+
+#### SubStateCommand
+
+```python
+["SubStateCommand", "name", "variable_name", "variable_key"]
+```
+
+Similar to the StateCommand, the SubStateCommand can be used to set the value of some key within an object, or index of an array
+that isstored as a state variable. Note that arrays stored as state variables are 0 indexed, so to return the first value of an array
+the number *'1'* should be used as the final parameter.
+
+Note that there is no SubSubStateCommand class, so there is inherently a depth limit of 1 for key/index values that can be accessed
+by using any command. Nothing prevents you from storing state variables with more complex nesting, but as a general rule it should
+be avoided because of this limitation.
+
+#### ChainCommand
+
+```json
+["ChainCommand", "name", "output_command", "input_command"]
+```
+
+The ChainCommand is used to pass the "output" (i.e.: any message that would be sent to chat) of one command to the "input" of another
+(i.e.: the arguments that would be passed if the command were invoked in chat).
+
+This command is particularly powerful when combined with SequenceCommands and OptionCommands, but another common use case would be
+to chain the output of a JsonCommand to the input of a PostCommand in order to, for example, use a set of state variables to make up
+the body of a POST request for an external API.
 
 #### SequenceCommand
 
@@ -231,26 +318,4 @@ except that the first argument passed to the initial **OptionCommand**
 will not be passed to the option selected. So *'!option_command choice
 arg1'* will not pais *'choice'* to the other command specified by that
 choice.
-
-#### StateCommand
-
-```python
-["StateCommand", "name", (optional)"key"]
-```
-
-#### SubStateCommand
-#### FormatCommand
-#### JsonCommand
-#### ChainCommand
-#### PostCommand
-
-These commands set some 'state variable' of the bot, stored in the
-**TwitchBot.state** dict attribute. The name of the command is used
-as the key for the state dict by default, but optionally, the key
-can be specified so that the command's name is different from the
-name of the state variable.
-
-The arguments passed to a **StateCommand** are concatenated by " "
-strings such that *'!state_command some value here'* set's the state
-variable to the string *'some value here'*.
 
