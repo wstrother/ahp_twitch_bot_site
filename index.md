@@ -16,26 +16,26 @@ you can always view the source code in the actual repo, which aims to have compl
 
 #### Requirements
 
-* Python 3
-* A Twitch account for your bot
+* [Python 3](https://www.python.org/downloads/)
+* [A Twitch account for your bot](https://www.twitch.tv/signup)
 
 #### Resources
 
-* JSON
-* Python
-* AHP Twitch Bot on Github
+* [JSON](https://developer.mozilla.org/en-US/docs/Glossary/JSON)
+* [Python](https://docs.python.org/3/)
+* [AHP Twitch Bot on Github](https://github.com/wstrother/ahp_twitch_bot)
 
 ---
 
 ## Getting Started
 
-Any of the classes defined in the four core modules can be subclassed to define more specific functionality, but the **BotLoader** class in **twitch_bot.py** 
-helps define a JSON based data interface that can be used to automatically customize the implementation of your Twitch bot. If you aren't comfortable with Python
-or don't require any extensive custom functionality, the following files are the only ones you need to worry about.
+AHP Twitch Bot is implemented in Python and to run it locally on your computer you will need to have Python installed, but you don't need to know anything
+about programming in order to use it to enhance your streaming experience. The following files are all you need to get started.
 
 ### **stream.py**
 
-This file represents the application entry point and an example is provided in the core repository.
+This file represents the application entry point and an example is provided in the core repository. Once you have cloned the repository or downloaded
+and extracted it as a zip file, you can change the file `stream.py.example` to be named `stream.py` and edit it as follows:
 
 ```python
 from ahp_twitch_bot.twitch_bot import TwitchBot, BotLoader
@@ -53,11 +53,23 @@ if __name__ == "__main__":
 ```
 
 The **USER_NAME** and **CHANNEL** variable should be set to the user name of the Twitch account you created for your bot, and the channel you want it to connect to,
-i.e. your own Twitch user name. 
+i.e. your own Twitch user name.
+
+**Note:** It should go without saying, but don't create a bot and tell it to connect to someone else's stream chat unless they specifically asked you to. The Twitch IRC
+protocol that this bot makes use of is totall open and would technically allow you to do this because it's literally the same as joining someone's chat through
+the Twitch website. But it would be very rude to do this, and you can be banned, and it most certainly violates Twitch's terms of service to use an automated program
+to send messages in someone's chat without their permission!
+
+Once you have edited `stream.py` to allow your Twitch bot's account to connect your chat, you can run the program by opening a command prompt window in the folder
+where you cloned/extracted the repository and typing the following command:
+
+```json
+> python stream.py
+```
 
 ### oauth.token
 
-Be sure to create a file for your oauth token (obtainable [here](https://twitchapps.com/tmi/)). 
+Be sure to create a file for your oauth token (obtainable [here](https://twitchapps.com/tmi/)). Simply copy paste the token into the file and save it.
 
 ***REMEMBER TO KEEP THIS TOKEN SECRET!***
 
@@ -67,7 +79,7 @@ If you ever accidentally share this token, you can revoke it or generate a new t
 
 ### **bot_settings.json**
 
-To define attributes and behaviors for your bot, you'll need to create a JSON data file and provide some instuctions. The following keys can be defined to support
+To define attributes and behaviors for your bot, you'll need to create a JSON data file and provide some instructions. The following keys can be defined to support
 whatever functionality you want to implement.
 
 ```json
@@ -103,13 +115,13 @@ users
 * **state:** defines a set of arbitrary data and variables that can be set or referenced by certain commands
 
 In the example JSON above, you will see I have used *:command* to represent the individual commands that will be defined in this file, but note that
-here I used *:command* as a shorthand for the JSON specification that will be defined in the following sections.
+this is just a shorthand for the JSON specification that will be defined in the following sections.
 
 ---
 
 ## Defining Commands
 
-Commands defined within your JSON data will need to be expressed as an array that contain a series of arguments. This array will always begin by specifying 
+Commands defined within your JSON data will need to be expressed as an array that contain a series of parameters. This array will always begin by specifying 
 a CommandClass, then the *name* of the command, (i.e.: how it is invoked in chat) and then any initialization parameters.
 
 **Note**: The terms "parameter" and "argument" are often interchangeable, but here I use "parameter" to refers specifically to the "initialization arguments" of the command itself.
@@ -128,13 +140,13 @@ I might have a command that viewers can invoke called *!pb* to see my current pe
 my current personal best in 'The Legend of Zelda: A Link to the Past.' In this case, *ssb* is an "argument" for the command's usage,
 not the command itself or its definition.
 
-To be clear, in the Python implementation, this sense of "argument" is passed to the `CommandClass.do()` method. If you're unsure what that means, the important
+Again, in the Python implementation, this sense of "argument" is passed to the `CommandClass.do()` method. If you're unsure what that means, the important
 point to take away is that **arguments passed to commands by users in chat DO NOT permanently alter the functionality of the command itself.** They only affect
 what it does in that particular case.
 
-### JSON Specification for Commands
+#### JSON Specification for Commands
 
-In the example JSON provided above, the use of *:command1* etc. is a shorthand for the following specification:
+In the example JSON provided above, the use of *:command1* etc. is a shorthand for the following syntax:
 
 ```json
 ["CommandClass", "command_name", "parameter1", "parameter2"...]
@@ -150,16 +162,16 @@ The parameters will depend on the type of command you are defining and what you 
 ## CommandClasses
 
 I've used the term "`CommandClass`" throughout this document to refer to (in Python terms) subclasses of the base class `Comand` as defined in `commands.py` in the source code. 
-The names of these subclasses (with the CamelCase convention, as listed below) is the literal string you use to specify what type of command you are creating.
+The names of these subclasses (with the CamelCase convention, as listed below) are the literal strings you use to specify what type of command you are creating.
 
-The following subclasses define the types of commands you can create, but as you will see, their combined usage can get quite complicated
-because of the way they can be combined and used to invoke each other. We'll start with the simplest examples and work our way up.
+The following subclasses define the types of commands you can create, but as you will see, their combined usage can get quite complicated and powerful
+because of the way they can be joined together and used to invoke each other. We'll start with the simplest examples and work our way up.
 
 
 ### TextCommand
 
 ```json
-["TextCommand", "name", "text for your bot to send to the chat"]
+["TextCommand", "name", "Text for your bot to send to the chat"]
 ```
 
 The simplest use case, this type of command simply causes your bot to say something to the chat whenever it is invoked.
@@ -170,14 +182,16 @@ The simplest use case, this type of command simply causes your bot to say someth
 ["FormatCommand", "name", "Formatted text with {variable_interploation}"]
 ```
 
-Similar to the `TextCommand` class, these except they support a type of variable interpolation based on the specification in Python's
-`str.format()` string method. The variable set passed to this formatting method comes from the bot's state variable set
-and they can be interpolated by the string by enclosing the variable name in curly brackets like this: *'{variable_name}'*.
+Similar to the `TextCommand` class, these commands support a type of variable interpolation based on the specification in Python's
+`str.format()` method. The set of variables passed to this formatting method come from the bot's state variables
+and they can be interpolated into the string by enclosing the variable name in curly brackets like this: *'{variable_name}'*
 
-Note that these variable names can also support key or index specifications within square brackets, i.e.: *'{variable[subkey]}'*.
+**Note:** These variable interpolations can also support key or index specifications within square brackets, i.e.: *'{variable[subkey]}'*. So if, for example,
+you have a state variable called `list` that looks like *["One", "Two", "Three"]* then using the formatting parameter *"{list[0]}"* 
+your bot will send the message *One* to the chat.
 
-Python's string formatting method also supports some additional formatting arguments as specified [here](https://docs.python.org/3/library/string.html#format-specification-mini-language).
-This provides support for padding, alignment, and some numeric conversion. Bear in mind, that in the source code's implementation
+Python's string formatting method also supports some additional formatting arguments as specified [here.](https://docs.python.org/3/library/string.html#format-specification-mini-language)
+This allows for padding, alignment, and some numeric conversion. Bear in mind that in the source code's implementation
 the formatting method is called with the state variables passed as named keywords, so the `FormatCommand` class itself doesn't
 support the use of positional arguments.
 
