@@ -7,7 +7,7 @@ body {
     font-size: 12pt;
 }
 
-h1 {color: rgba(197, 197, 178, 0.534)}
+h1 {color: rgba(197, 197, 178, 0.89)}
 a {color:rgb(32, 27, 83)}
 a:hover {color:rgb(57, 51, 133)}
 
@@ -16,7 +16,7 @@ content {
     width: 50%;
     padding: 1rem 2.5rem 1rem 1rem;
     min-width: 800px;
-    background-color: rgba(197, 197, 178, 0.534);
+    background-color: rgba(197, 197, 178, 0.89);
     color: rgb(29, 28, 28);
 }
 
