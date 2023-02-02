@@ -30,7 +30,9 @@ you can always view the source code in the actual repo, which aims to have compl
 ## Getting Started
 
 AHP Twitch Bot is implemented in Python and to run it locally on your computer you will need to have Python installed, but you don't need to know anything
-about programming in order to use it to enhance your streaming experience. The following files are all you need to get started.
+about programming in order to use it to enhance your streaming experience. 
+
+First, start by cloning the repository (or downloading as a zip and extracting it). Now the following files are all you need to edit to get started.
 
 ### **stream.py**
 
@@ -56,7 +58,7 @@ The **USER_NAME** and **CHANNEL** variable should be set to the user name of the
 i.e. your own Twitch user name.
 
 **Note:** It should go without saying, but don't create a bot and tell it to connect to someone else's stream chat unless they specifically asked you to. The Twitch IRC
-protocol that this bot makes use of is totall open and would technically allow you to do this because it's literally the same as joining someone's chat through
+protocol that this bot makes use of is totally open and would technically allow you to do this because it's literally the same as joining someone's chat through
 the Twitch website. But it would be very rude to do this, and you can be banned, and it most certainly violates Twitch's terms of service to use an automated program
 to send messages in someone's chat without their permission!
 
@@ -114,48 +116,102 @@ users
 * **public:** defines commands that anyone in chat can use
 * **state:** defines a set of arbitrary data and variables that can be set or referenced by certain commands
 
-In the example JSON above, you will see I have used *:command* to represent the individual commands that will be defined in this file, but note that
+In the example JSON above, you will see I have used `:command1` etc. to represent the individual commands that will be defined in this file, but note that
 this is just a shorthand for the JSON specification that will be defined in the following sections.
+
+**Note:** Your bot's state values are not persistent and if the `stream.py` process is terminated then upon reconnecting they will go back to the initial
+values as defined in your setting file.
 
 ---
 
 ## Defining Commands
 
 Commands defined within your JSON data will need to be expressed as an array that contain a series of parameters. This array will always begin by specifying 
-a CommandClass, then the *name* of the command, (i.e.: how it is invoked in chat) and then any initialization parameters.
+a `CommandClass`, then the name of the command, and then any initialization parameters.
 
-**Note**: The terms "parameter" and "argument" are often interchangeable, but here I use "parameter" to refers specifically to the "initialization arguments" of the command itself.
+#### "Parameters" vs. "Arguments"
 
-In the Python implementation, these are literally the arguments passed to the `CommandClass.__init__()` method when the class object is instantiated. 
+The terms "parameter" and "argument" are often interchangeable, but here I use "parameter" to refer specifically to the "initialization arguments" of the command itself.
+
+In the Python implementation, these are the arguments passed to the `CommandClass.__init__()` method when the class object is instantiated. 
 In other words: they are the settings that define what the command actually does.
 
 This usage can be confusing because -- like with other Twitch Bots -- the command can also be thought of as taking "arguments" when invoked by a user in chat,
 so I will try to be very consistent in using "parameter" and "argument" to mean different things.
 
-A command can be invoked in chat by typing *!name_of_command* and the "arguments" passed to it are just any following words, separated by spaces, 
-i.e.: *!name_of_command argument1 argument2...* and so on. 
+A command can be invoked in chat by typing *!name* and the "arguments" passed to it are just any following words, separated by spaces, 
+i.e.: *!name argument1 argument2...* and so on. 
 
 For example,
-I might have a command that viewers can invoke called *!pb* to see my current personal best in a given speed game. The user might type *!pb alttp* to see
+I might have a command that viewers can invoke with *!pb* to see my current personal best in a given speed game. The user might type *!pb alttp* to see
 my current personal best in 'The Legend of Zelda: A Link to the Past.' In this case, *ssb* is an "argument" for the command's usage,
 not the command itself or its definition.
 
 Again, in the Python implementation, this sense of "argument" is passed to the `CommandClass.do()` method. If you're unsure what that means, the important
 point to take away is that **arguments passed to commands by users in chat DO NOT permanently alter the functionality of the command itself.** They only affect
-what it does in that particular case.
+what it does in that particular instance.
 
-#### JSON Specification for Commands
+### JSON Specification for Commands
 
-In the example JSON provided above, the use of *:command1* etc. is a shorthand for the following syntax:
+In the example JSON provided above, the use of `:command1` etc. is a shorthand for the following syntax:
 
 ```json
-["CommandClass", "command_name", "parameter1", "parameter2"...]
+// :command
+["CommandClass", "command_name", "parameter1", "parameter2",...]
 ```
 
-In JSON terms, this is an array of strings whereby the first string specifies the particular type of command you are defining (See below). The second string
-specifies the name of the command, which to say, how it is invoked in chat, i.e.: *!command_name*
+In JSON terms, this is an array of strings (and in certain cases, other data types) whereby the first string specifies the particular type of command you are defining.
+The second string specifies the name of the command, and the following parameters will depend on the type of command you are defining and what you want it to do.
+The different types of commands are defind in the following section, but first let's go over:
 
-The parameters will depend on the type of command you are defining and what you want it to do. 
+### Inner Commands
+
+When we get to the specific command types below, you will occasionally see the use of `:inner_command` within the list of parameters. Again, this is a shorthand
+for a particular JSON specification, but when defining inner commands this way, the syntax is slightly different and can take one of three forms.
+
+#### CommandName Strings
+
+Inner commands can be defined by simply passing the name of the other command as a string:
+
+```json
+// :inner_command
+["OuterCommandClass", "outer_command_name", "outer_command_parameters",... "inner_command_name"]
+```
+
+**Note**: In this case, do make sure that `inner_command_name` is actually defined somewhere in your `bot_settings.json` file, otherwise `stream.py` 
+will throw an error when trying to initialize your bot.
+
+#### Command/Argument Arrays
+
+Inner commands can be invoked by an outer command with a certain set of arguments already specified, like so:
+
+```json
+// :inner_command
+["OuterCommandClass", "outer_command_name", "outer_command_parameters",...
+  ["inner_command_name", "inner_command_arg1", "inner_command_arg2",...]
+]
+```
+
+**Note**: In addition to ensuring the `inner_command_name` is actually defined, notice that the inner command and its arguments are contained
+within their own array. A common mistake I make when creating command sets is forgetting to wrap them in this inner array, which will usually
+cause `stream.py` to throw an error and almost certainly won't give you the right functionality.
+
+#### Anonymous Command Definitions
+
+The syntax for this type of inner command is exactly the same as the top level list of commands you are defining for your `public` and `restricted` arrays,
+the only difference being that they are not given a name. Consequently, these commands can't be invoked on their own and in a sense
+they "belong" to the outer command they are a parameter for.
+
+```json
+// :inner_command
+["OuterCommandClass", "outer_command_name", "outer_command_parameters",...
+  ["InnerCommandClass", "inner_parameter1", "inner_parameter2",...]
+]
+```
+
+**Note:** Unlike the "Command/Argument Array" syntax mentioned above, you can't specify arguments for this type of inner command, only its initialization parameters.
+If you think about it, this makes sense because this "anonymous" command can't be invoked anywhere else, so its functionality can't depend on receiving certain arguments
+when invoked.
 
 ---
 
@@ -179,32 +235,74 @@ The simplest use case, this type of command simply causes your bot to say someth
 ### FormatCommand
 
 ```json
-["FormatCommand", "name", "Formatted text with {variable_interploation}"]
+["FormatCommand", "name", 
+  "Formatted text with {variable_interploation}"(, {"inner_keyword": "some value",...})
+]
 ```
 
-Similar to the `TextCommand` class, these commands support a type of variable interpolation based on the specification in Python's
+Similar to the `TextCommand` class, the `FormatCommand` supports a type of variable interpolation based on the specification in Python's
 `str.format()` method. The set of variables passed to this formatting method come from the bot's state variables
-and they can be interpolated into the string by enclosing the variable name in curly brackets like this: *'{variable_name}'*
+and they can be interpolated into the string by enclosing the variable name in curly brackets like this: `"{variable_name}"`
 
-**Note:** These variable interpolations can also support key or index specifications within square brackets, i.e.: *'{variable[subkey]}'*. So if, for example,
-you have a state variable called `list` that looks like *["One", "Two", "Three"]* then using the formatting parameter *"{list[0]}"* 
+An optional final parameter allows for the use of a JSON object that provides additional keyword/value pairs to be interpolated as variables.
+There's not really a reason to do this explicitly in your `bot_settings.json` file, but if used in conjuction with the `GetCommand` 
+it allows you to take the response from an external API and format it using values from the JSON that is returned from the GET request.
+
+**Note:** These variable interpolations can also support key or index arguments: `{variable[subkey]}`
+
+For example, if you have a state variable called `list` that looks like `["One", "Two", "Three"]` then given the formatting parameter `"{list[0]}"`
 your bot will send the message *One* to the chat.
 
 Python's string formatting method also supports some additional formatting arguments as specified [here.](https://docs.python.org/3/library/string.html#format-specification-mini-language)
-This allows for padding, alignment, and some numeric conversion. Bear in mind that in the source code's implementation
-the formatting method is called with the state variables passed as named keywords, so the `FormatCommand` class itself doesn't
-support the use of positional arguments.
+This allows for padding, alignment, and some numeric conversion. Bear in mind that in the source code's implementation,
+the `str.format()` method is called with the state variables passed as named keywords, so the `FormatCommand` class itself doesn't
+support the use of positional arguments in this expression syntax.
+
+### StateCommand
+
+```json
+["StateCommand", "name"(, "key")]
+```
+
+The `StateCommand` sets the value of some state variable to the arguments passed to it. 
+
+By default, the name of the command is used as the name for the state variable, but the optional third parameter can be specified 
+so that the command's name is different from the name of the state variable itself.
+
+**Note:** The arguments passed to this command when invoked are concatenated into a single string, so for example,
+the message *!variable1 argument1 argument2* 
+
+### SubStateCommand
+
+```json
+["SubStateCommand", "name", "variable_name", "variable_key"]
+```
+
+Similar to the `StateCommand`, the `SubStateCommand` can be used to set the value of some key within an object, or index of an array
+that is stored as a state variable. 
+
+**Note:** Arrays stored as state variables are zero-indexed, so to return the first value of an array
+the number `0` should be used as the final parameter.
+
+**Note:** When setting a value by index within an array, you cannot "create" a new array element by accessing an array index that doesn't exist yet.
+You can, however, set the value of arbitrary keys on a state variable that is defined as a JSON object, should you wish to do so.
+
+**Note:** there is no `SubSubStateCommand` class, so there is inherently a depth limit for key/index values that can be accessed
+by using any command. Nothing prevents you from storing state variables with more complex nesting, but you should keep this limitation in mind
+when creating state variables.
 
 ### JsonCommand
 
 ```json
-["JsonCommand", "name", {"some_key": "some value that can be {variable_interpolated}"}]
+["JsonCommand", "name", 
+  {"some_key": "some value that can be {variable_interpolated}",...}
+]
 ```
 
 The `JsonCommand` class takes a third parameter that should be a JSON object rather than a string. The intended use for this
-`CommandClass` is to be able to create a JSON formatted string that can then be passed to a `PostCommand` to make up the body of its post request.
+`CommandClass` is to be able to create a JSON formatted string that can then be passed to a `PostCommand` to make up the body of its POST request.
 
-They value for each key within the JSON object can also be interpolated with state variables, just like the FormatCommand class.
+The value for each key within the JSON object can also be interpolated with state variables, just like the FormatCommand class.
 This formatting is performed recursively so strings within nested objects will also be interpolated.
 
 
@@ -216,8 +314,8 @@ This formatting is performed recursively so strings within nested objects will a
 
 The PostCommand is used to send a POST request to an API endpoint specified by the URL parameter.
 
-Note that when the `PostCommand` is invoked in chat, the argument passed to it must be a valid JSON serializable string, which is treated as
-the body of the POST request. Because this is error prone and unwieldy, it's reccomended that the `PostCommand` be used in conjunction 
+**Note:** When the `PostCommand` is invoked in chat, the arguments passed to it must form a valid JSON serializable string, which is treated as
+the body of the POST request. Because this is error prone and unwieldy, it's recommended that the `PostCommand` be used in conjunction 
 with other commands, typically a `JsonCommand` in order to provide a properly fromatted JSON serializable string.
 
 ### GetCommand
@@ -226,42 +324,22 @@ with other commands, typically a `JsonCommand` in order to provide a properly fr
 ["PostCommand", "name", "url"]
 ```
 
-Similar to the `PostCommand`, the `GetCommand` sends a GET an API endpoint specified by the URL parameter and echos its output to chat.
+Similar to the `PostCommand`, the `GetCommand` sends a GET request to an API endpoint specified by the URL parameter and sends the response to chat.
 
-Because most web APIs return data as serialized JSON, it might be more useful to chain this command with other commands, just like the `PostCommand`.
-
+Because most web APIs return data as serialized JSON, it is generally more useful to chain this command with other commands, such as the `FormatCommand`,
+similar to the use of `PostCommand` in reverse.
 
 ### AliasCommand
 
-```python
+```json
 ["AliasCommand", "name", "other_command", "arg1", "arg2"...]
 ```
 
-These commands do not take any arguments. Instead they invoke some other command with a specified set of arguments passed to it. 
-They are useful for creating a shorthand for a common command/argument pairs such as typing *!ssb* to invoke *!game Super Smash Bros.*.
+The `AliasCommand` is used to invoke some other command with a specified set of arguments passed to that other command. 
+They are useful for creating a shorthand for a common command/argument pairs such as typing *!ssb* to invoke *!game Super Smash Bros.*
 
-### StateCommand
-
-```python
-["StateCommand", "name", (optional)"key"]
-```
-
-These commands set some 'state variable' of the bot. By default, the name of the command is used as the name for the state variable,
- but the optional third parameter can be specified so that the command's name is different from the name of the state variable.
-
-### SubStateCommand
-
-```python
-["SubStateCommand", "name", "variable_name", "variable_key"]
-```
-
-Similar to the `StateCommand`, the `SubStateCommand` can be used to set the value of some key within an object, or index of an array
-that isstored as a state variable. Note that arrays stored as state variables are 0 indexed, so to return the first value of an array
-the number 1 should be used as the final parameter.
-
-**Note:** there is no `SubSubStateCommand` class, so there is inherently a depth limit of 1 for key/index values that can be accessed
-by using any command. Nothing prevents you from storing state variables with more complex nesting, but as a general rule it should
-be avoided because of this limitation.
+**Note:** The parameter for the other command to be invoked must be a string and refer to a defined command.
+The "Command/Argument Arrays" and "Anonymous Command Definitions" mentioned in the previous section don't work here.
 
 ### ChainCommand
 
@@ -276,62 +354,68 @@ This command is particularly powerful when combined with `SequenceCommands` and 
 to chain the output of a `JsonCommand` to the input of a PostCommand in order to, for example, use a set of state variables to make up
 the body of a POST request for an external API.
 
+**Note:** The parameters for the output and input commands must be strings referring to defined commands.
+The "Command/Argument Arrays" and "Anonymous Command Definitions" mentioned in the previous section don't work here.
+
 ### SequenceCommand
 
 ```json
-["SequenceCommand", "name",
-  :command_entry1,
-  :command_entry2...
+["SequenceCommand", "name", :inner_command1, :inner_command2...]
+```
+
+The `SequenceCommand` will invoke a series of other commands, passing any arguments it receives to each command in the series it invokes.
+
+**Note:** Any inner commands defined here with a specified set of arguments will have those arguments passed to it **before** the arguments
+from the chat when the SequenceCommand is invoked.
+
+So for example, if I define a `SequenceCommand` as follows:
+
+```json
+["SequenceCommand", "sequence", 
+  ["inner_command", "inner_arg1", "inner_arg2"]
 ]
 ```
 
-These commands will invoke a series of other commands, passing any arguments
-they receive to each command in the series they invoke. Each ':command_entry'
-item can be expressed in a number of ways:
+I could invoke it in chat with the message: 
 
-* **["ClassName", "init_arg1", "init_arg2"...]:** an "anonymous" command,
-which will not have a name or be invokable on it's own, and a set
-of initialization arguments for that class
-* **command_name":** the name of some other command to invoke
-* **["command_name", "arg1", "arg2"...]:** the name of some other
-command to invoke and a set of arguments to pass to it before the
-arguments invoked with the original SequenceCommand
+*!sequence outer_arg1 outer_arg2*
 
-Because usage of these expressions is so flexible, it's important to be
-clear on the way arguments specified in these expressions interact with
-the arguments passed from the chat as the SequenceCommand is invoked.
+The inner command will then be invoked as if the following message was sent in chat: 
 
-In the first case, the *init_args* are used to instantiate the anonymous
-command, and arguments passed to the SequenceCommand will also be passed to
-that anonymous command.
-
-In the second case, the same arguments passed to the SequenceCommand are
-passed to the named comman specified for that step.
-
-In the third case, the arguments specified in the *:command_entry* step
-expression are passed *before* the arguments invoked with the SequenceCommand
-in the chat. So typing *!sequence_command arg3 arg4* where *sequence_command*
-has some step expressed as **['other_command', 'arg1', 'arg2']** would be the
-same as typing *!other_command arg1 arg2 arg3 arg4*.
+*!inner_command inner_arg1 inner_arg2 outer_arg1 outer_arg2*
 
 ### OptionCommand
 
 ```python
-["OptionCommand", "name"
-  :command_entry1,
-  :command_entry2...
+["OptionCommand", "name", 
+  ["option1", :inner_command1], 
+  ["option2", :inner_command2]...
 ]
 ```
 
-These commands take some argument and use it to determine which from a
-series of other commands to invoke, passing all arguments after the first
-to that other command. Here, any *:command_entry* expression can have
-any of the same formats specified for **SequenceCommand**, including
-'anonymous' commands and other commands invoked with specified arguments.
+The `OptionCommand` takes some argument and uses it to determine which from a series of other commands to invoke, 
+passing all additional arguments after the first one to that inner command. 
 
-The same rules apply for passing arguments as with **SequenceCommand**
-except that the first argument passed to the initial **OptionCommand**
-will not be passed to the option selected. So *!option_command choice
-arg1* will not pass *choice* to the other command specified by that
-choice.
+**Note:** The same rules apply for passing outer vs. inner arguments as with **SequenceCommand** except that here,
+the first argument passed to the `OptionCommand` is not included.
 
+So for example, I could define an `OptionCommand` as follows:
+
+```json
+["OptionCommand", "option"
+  ["choice1", ["inner_command", "inner_arg1"]],
+  ["choice2", ["inner_command", "inner_arg2"]]
+]
+```
+
+It could then be invoked in chat by sending:
+
+*!option choice1 outer_arg*
+
+Which would be the same as sending the message:
+
+*!inner_command inner_arg1 outer_arg*
+
+**Note:** Each of the option parameters is itself an array, so when used in conjunction with "Command/Argument Arrays" and "Anonymous Command Definitions"
+each option will be an array with a string for each choice representing the first item and then an additional array as the second item.
+A common pitfall is forgetting to enclose an anonymous command, for example, in its own array.
