@@ -38,7 +38,7 @@ p {
 }
 
 p em {
-    background-color: rgba(189, 189, 189, 0.2);
+    background-color: rgba(189, 189, 189, 0.9);
     border-radius: 3px;
     padding: 0 5px;
     display: inline-block;
@@ -53,7 +53,7 @@ p strong {
 
 p > strong > em {
     display: block;
-    background-color: rgba(189, 189, 189, 0.2);
+    background-color: rgba(189, 189, 189, 0.9);
     border-radius: 3px;
     margin-left: 1rem;
     padding: 5px;
@@ -92,7 +92,7 @@ h3+.language-json {
 
 /* Code blocks parent element */
 .language-python,.language-json {
-    background-color: rgba(189, 189, 189, 0.2);
+    background-color: rgba(189, 189, 189, 0.9);
     border-radius: 3px;
 
     padding: 0.25rem;
