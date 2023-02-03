@@ -157,7 +157,7 @@ In the example JSON provided above, the use of `:command1` etc. is a shorthand f
 
 ```json
 // :command
-["CommandClass", "command_name", "parameter1", "parameter2",...]
+["CommandClass", "command_name", "param1", "param2",...]
 ```
 
 In JSON terms, this is an array of strings (and in certain cases, other data types) whereby the first string specifies the particular type of command you are defining.
@@ -174,8 +174,12 @@ for a particular JSON specification, but when defining inner commands this way, 
 Inner commands can be defined by simply passing the name of the other command as a string:
 
 ```json
-// :inner_command
-["OuterCommandClass", "outer_command_name", "outer_command_parameters",... "inner_command_name"]
+// :command
+["OuterCommandClass", "outer_command_name", 
+  "outer_command_params",... 
+  // :inner_command
+  "inner_command_name"
+]
 ```
 
 **Note**: In this case, do make sure that `inner_command_name` is actually defined somewhere in your `bot_settings.json` file, otherwise `stream.py` 
@@ -186,9 +190,15 @@ will throw an error when trying to initialize your bot.
 Inner commands can be invoked by an outer command with a certain set of arguments already specified, like so:
 
 ```json
-// :inner_command
-["OuterCommandClass", "outer_command_name", "outer_command_parameters",...
-  ["inner_command_name", "inner_command_arg1", "inner_command_arg2",...]
+// :command
+["OuterCommandClass", "outer_command_name", 
+  "outer_command_params",...
+  // :inner_command
+  [
+    "inner_command_name", 
+    "inner_command_arg1", 
+    "inner_command_arg2",...
+  ]
 ]
 ```
 
@@ -203,9 +213,15 @@ the only difference being that they are not given a name. Consequently, these co
 they "belong" to the outer command they are a parameter for.
 
 ```json
-// :inner_command
-["OuterCommandClass", "outer_command_name", "outer_command_parameters",...
-  ["InnerCommandClass", "inner_parameter1", "inner_parameter2",...]
+// :command
+["OuterCommandClass", "outer_command_name",
+  "outer_command_params",...
+  // :inner_command
+  [
+    "InnerCommandClass", 
+    "inner_parameter1", 
+    "inner_parameter2",...
+  ]
 ]
 ```
 
@@ -227,7 +243,9 @@ because of the way they can be joined together and used to invoke each other. We
 ### TextCommand
 
 ```json
-["TextCommand", "name", "Text for your bot to send to the chat"]
+["TextCommand", "name", 
+  "Text for your bot to send to the chat"
+]
 ```
 
 The simplest use case, this type of command simply causes your bot to say something to the chat whenever it is invoked.
@@ -236,7 +254,8 @@ The simplest use case, this type of command simply causes your bot to say someth
 
 ```json
 ["FormatCommand", "name", 
-  "Formatted text with {variable_interploation}"(, {"inner_keyword": "some value",...})
+  "Formatted text with {variable_interploation}", 
+  (optional) {"inner_keyword": "some value",...}
 ]
 ```
 
@@ -261,7 +280,9 @@ support the use of positional arguments in this expression syntax.
 ### StateCommand
 
 ```json
-["StateCommand", "name"(, "key")]
+["StateCommand", "name", 
+  (optional) "key"
+]
 ```
 
 The `StateCommand` sets the value of some state variable to the arguments passed to it. 
@@ -275,7 +296,9 @@ the message *!variable1 argument1 argument2*
 ### SubStateCommand
 
 ```json
-["SubStateCommand", "name", "variable_name", "variable_key"]
+["SubStateCommand", "name", 
+  "variable_name", "variable_key"
+]
 ```
 
 Similar to the `StateCommand`, the `SubStateCommand` can be used to set the value of some key within an object, or index of an array
@@ -309,7 +332,9 @@ This formatting is performed recursively so strings within nested objects will a
 ### PostCommand
 
 ```json
-["PostCommand", "name", "url"]
+["PostCommand", "name", 
+  "url"
+]
 ```
 
 The PostCommand is used to send a POST request to an API endpoint specified by the URL parameter.
@@ -321,7 +346,9 @@ with other commands, typically a `JsonCommand` in order to provide a properly fr
 ### GetCommand
 
 ```json
-["PostCommand", "name", "url"]
+["GetCommand", "name", 
+  "url"
+]
 ```
 
 Similar to the `PostCommand`, the `GetCommand` sends a GET request to an API endpoint specified by the URL parameter and sends the response to chat.
@@ -332,7 +359,9 @@ similar to the use of `PostCommand` in reverse.
 ### AliasCommand
 
 ```json
-["AliasCommand", "name", "other_command", "arg1", "arg2"...]
+["AliasCommand", "name", 
+  "other_command", "arg1", "arg2"...
+]
 ```
 
 The `AliasCommand` is used to invoke some other command with a specified set of arguments passed to that other command. 
@@ -344,7 +373,9 @@ The "Command/Argument Arrays" and "Anonymous Command Definitions" mentioned in t
 ### ChainCommand
 
 ```json
-["ChainCommand", "name", "output_command", "input_command"]
+["ChainCommand", "name", 
+  "output_command", "input_command"
+]
 ```
 
 The ChainCommand is used to pass the "output" (i.e.: any message that would be sent to chat) of one command to the "input" of another
@@ -360,7 +391,10 @@ The "Command/Argument Arrays" and "Anonymous Command Definitions" mentioned in t
 ### SequenceCommand
 
 ```json
-["SequenceCommand", "name", :inner_command1, :inner_command2...]
+["SequenceCommand", "name", 
+  :inner_command1, 
+  :inner_command2...
+]
 ```
 
 The `SequenceCommand` will invoke a series of other commands, passing any arguments it receives to each command in the series it invokes.
@@ -386,7 +420,7 @@ The inner command will then be invoked as if the following message was sent in c
 
 ### OptionCommand
 
-```python
+```json
 ["OptionCommand", "name", 
   ["option1", :inner_command1], 
   ["option2", :inner_command2]...
@@ -402,7 +436,7 @@ the first argument passed to the `OptionCommand` is not included.
 So for example, I could define an `OptionCommand` as follows:
 
 ```json
-["OptionCommand", "option"
+["OptionCommand", "option",
   ["choice1", ["inner_command", "inner_arg1"]],
   ["choice2", ["inner_command", "inner_arg2"]]
 ]

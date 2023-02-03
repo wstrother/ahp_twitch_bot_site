@@ -107,3 +107,22 @@ pre {
     font-size: 12pt;
     margin:0;
 }
+
+/* syntax highlighting */
+
+:root{
+    --bg-color: red;
+}
+
+.k {color: rgb(170, 57, 57)}
+.nn {}
+.kn {color: blue}
+.n {color: green}
+.p {color: rgb(146, 73, 142)}
+.o {color: purple}
+.s {color: rgb(160, 125, 60)}
+
+.nl {color: rgb(160, 42, 13)}
+.s2 {color: rgb(160, 125, 60)}
+.err {color: green}
+.mi {color: rgb(180, 36, 36)}
