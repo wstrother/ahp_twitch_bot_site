@@ -2,8 +2,8 @@
 permalink: /
 layout: page
 title: index
+toc: true
 ---
-
 ## Introduction
 
 The creaively named "AHP Twitch Bot" is a Python repository that I made which allows you to deploy a Twitch bot to enhance your streaming experience.

@@ -126,3 +126,11 @@ pre {
 .s2 {color: rgb(160, 125, 60)}
 .err {color: green}
 .mi {color: rgb(180, 36, 36)}
+
+
+/* table of contents */
+/* ul#toc {
+    position: absolute;
+    left:0;
+    top:0;
+} */
