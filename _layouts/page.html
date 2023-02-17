@@ -2,11 +2,47 @@
 <html lang="en">
 {%- include head.html -%}
 
+<script>
+    let toc;
+    let tocMenu;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        toc = document.getElementById("toc-list-container")
+        tocMenu = document.getElementById("toc-menu");
+
+        toc.classList.add("closed");
+        tocMenu.classList.add("closed");
+
+        tocMenu.addEventListener("click", ()=>toggleTOC());
+    });
+
+    function toggleTOC() {
+        console.log("clicked");
+        toc.classList.toggle("closed");
+        tocMenu.classList.toggle("closed");
+    }
+</script>
+
 <body>
+    <div id="toc-container">
+        <div id="toc-container-inner">
+            <div id="toc-menu">
+                <em id="toc-button"><img src="assets/menu.svg" /></em> 
+                <span>
+                    Table of Contents
+                </span>
+            </div>
+            
+            <div id="toc-list-container">
+                {{ content | toc_only }}
+            </div>
+        </div>
+    </div>
+    
     {%- include header.html -%}
 
     <content>
-        {{ content | toc }}
+        {{ content }}
     </content>
 
 </body>
