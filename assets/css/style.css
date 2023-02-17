@@ -22,6 +22,16 @@ content {
     color: rgb(29, 28, 28);
 }
 
+@media screen and (max-width:768px) {
+    body {
+        display: block;
+    }
+    content {
+        width:700px;
+        min-width: 700px;
+    }
+}
+
 h2:first-child {
     margin-top: 0;
 }
