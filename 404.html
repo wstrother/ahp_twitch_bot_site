@@ -1,9 +1,52 @@
----
-permalink: /404.html
-layout: page
----
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style type="text/css" media="screen">
+    <title>AHP_Twitch_Bot Homepage - </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:wght@300;400;500;600;700" rel="stylesheet" />
+
+    <link href="assets/css/style.css" type="text/css" rel="stylesheet">
+
+</head><script>
+    let toc;
+    let tocMenu;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        toc = document.getElementById("toc-list-container")
+        tocMenu = document.getElementById("toc-menu");
+
+        toc.classList.add("closed");
+        tocMenu.classList.add("closed");
+
+        tocMenu.addEventListener("click", ()=>toggleTOC());
+    });
+
+    function toggleTOC() {
+        console.log("clicked");
+        toc.classList.toggle("closed");
+        tocMenu.classList.toggle("closed");
+    }
+</script>
+
+<body>
+    <div id="toc-container">
+        <div id="toc-container-inner">
+            <div id="toc-menu">
+                <em id="toc-button"><img src="assets/menu.svg" /></em> 
+                <span>
+                    Table of Contents
+                </span>
+            </div>
+            
+            <div id="toc-list-container">
+                
+            </div>
+        </div>
+    </div><h1>AHP Twitch Bot</h1><content>
+        <style type="text/css" media="screen">
   .container {
     margin: 10px auto;
     max-width: 600px;
@@ -23,3 +66,9 @@ layout: page
   <p><strong>Page not found :(</strong></p>
   <p>The requested page could not be found.</p>
 </div>
+
+    </content>
+
+</body>
+
+</html>

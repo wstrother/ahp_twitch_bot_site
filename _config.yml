@@ -1,9 +1,0 @@
-title: AHP_Twitch_Bot Homepage
-email: wyatt.strother@gmail.com
-baseurl: "" 
-url: "http://wstrother.github.io" 
-github_username:  wstrother
-font_str: Quicksand:wght@300;400;500;600;700
-
-plugins:
-  - jekyll-toc

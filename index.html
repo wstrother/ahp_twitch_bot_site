@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>AHP_Twitch_Bot Homepage - index</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:wght@300;400;500;600;700" rel="stylesheet" />
+
+    <link href="assets/css/style.css" type="text/css" rel="stylesheet">
+
+</head><script>
+    let toc;
+    let tocMenu;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        toc = document.getElementById("toc-list-container")
+        tocMenu = document.getElementById("toc-menu");
+
+        toc.classList.add("closed");
+        tocMenu.classList.add("closed");
+
+        tocMenu.addEventListener("click", ()=>toggleTOC());
+    });
+
+    function toggleTOC() {
+        console.log("clicked");
+        toc.classList.toggle("closed");
+        tocMenu.classList.toggle("closed");
+    }
+</script>
+
+<body>
+    <div id="toc-container">
+        <div id="toc-container-inner">
+            <div id="toc-menu">
+                <em id="toc-button"><img src="assets/menu.svg" /></em> 
+                <span>
+                    Table of Contents
+                </span>
+            </div>
+            
+            <div id="toc-list-container">
+                <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h2"><a href="#introduction">Introduction</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#requirements">Requirements</a></li>
+<li class="toc-entry toc-h4"><a href="#resources">Resources</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#getting-started">Getting Started</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#streampy">stream.py</a></li>
+<li class="toc-entry toc-h3"><a href="#oauthtoken">oauth.token</a></li>
+<li class="toc-entry toc-h3"><a href="#bot_settingsjson">bot_settings.json</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#defining-commands">Defining Commands</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#parameters-vs-arguments">“Parameters” vs. “Arguments”</a></li>
+<li class="toc-entry toc-h3"><a href="#json-specification-for-commands">JSON Specification for Commands</a></li>
+<li class="toc-entry toc-h3"><a href="#inner-commands">Inner Commands</a>
+<ul>
+<li class="toc-entry toc-h4"><a href="#commandname-strings">CommandName Strings</a></li>
+<li class="toc-entry toc-h4"><a href="#commandargument-arrays">Command/Argument Arrays</a></li>
+<li class="toc-entry toc-h4"><a href="#anonymous-command-definitions">Anonymous Command Definitions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#commandclasses">CommandClasses</a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#textcommand">TextCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#formatcommand">FormatCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#statecommand">StateCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#substatecommand">SubStateCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#jsoncommand">JsonCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#postcommand">PostCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#getcommand">GetCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#aliascommand">AliasCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#chaincommand">ChainCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#sequencecommand">SequenceCommand</a></li>
+<li class="toc-entry toc-h3"><a href="#optioncommand">OptionCommand</a></li>
+</ul>
+</li>
+</ul>
+            </div>
+        </div>
+    </div><h1>AHP Twitch Bot</h1><content>
+        <h2 id="introduction">Introduction</h2>
+
+<p>The creaively named “AHP Twitch Bot” is a Python repository that I made which allows you to deploy a Twitch bot to enhance your streaming experience.
+The implementation of this bot relies on a JSON settings file with a particular specification for defining commands, state variables, and privileged users
+in order to create your own custom functionality. This webpage serves as a documentation for that specification.</p>
+
+<p>This documentation resource does not presume any programming knowledge on the part of the reader. I may refernce the Python implementation with regards
+to a specific functionality, but this is mainly for completeness and it’s okay if you don’t understand it. If you are interested in the implementation details
+you can always view the source code in the actual repo, which aims to have complete doc strings and extensive comments for additional documentation.</p>
+
+<h4 id="requirements">Requirements</h4>
+
+<ul>
+  <li><a href="https://www.python.org/downloads/">Python 3</a></li>
+  <li><a href="https://www.twitch.tv/signup">A Twitch account for your bot</a></li>
+</ul>
+
+<h4 id="resources">Resources</h4>
+
+<ul>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/JSON">JSON</a></li>
+  <li><a href="https://docs.python.org/3/">Python</a></li>
+  <li><a href="https://github.com/wstrother/ahp_twitch_bot">AHP Twitch Bot on Github</a></li>
+</ul>
+
+<hr />
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>AHP Twitch Bot is implemented in Python and to run it locally on your computer you will need to have Python installed, but you don’t need to know anything
+about programming in order to use it to enhance your streaming experience.</p>
+
+<p>First, start by cloning the repository (or downloading as a zip and extracting it). Now the following files are all you need to edit to get started.</p>
+
+<h3 id="streampy"><strong>stream.py</strong></h3>
+
+<p>This file represents the application entry point and an example is provided in the core repository. Once you have cloned the repository or downloaded
+and extracted it as a zip file, you can change the file <code class="language-plaintext highlighter-rouge">stream.py.example</code> to be named <code class="language-plaintext highlighter-rouge">stream.py</code> and edit it as follows:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">ahp_twitch_bot.twitch_bot</span> <span class="kn">import</span> <span class="n">TwitchBot</span><span class="p">,</span> <span class="n">BotLoader</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+  <span class="n">USER_NAME</span> <span class="o">=</span> <span class="s">"your_bot_user_name"</span>
+  <span class="n">CHANNEL</span> <span class="o">=</span> <span class="s">"#your_twitch_channel"</span>
+  <span class="n">TOKEN</span> <span class="o">=</span> <span class="s">"oauth.token"</span>
+  <span class="n">SETTINGS</span> <span class="o">=</span> <span class="s">"bot_settings.json"</span>
+  <span class="n">JOIN_MESSAGE</span> <span class="o">=</span> <span class="s">"Logging on..."</span>
+
+  <span class="n">BotLoader</span><span class="p">.</span><span class="n">load_bot</span><span class="p">(</span>
+      <span class="n">SETTINGS</span><span class="p">,</span> <span class="n">TwitchBot</span><span class="p">,</span> <span class="p">(</span><span class="n">USER_NAME</span><span class="p">,</span> <span class="n">TOKEN</span><span class="p">)</span>
+  <span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">CHANNEL</span><span class="p">,</span> <span class="n">JOIN_MESSAGE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The <strong>USER_NAME</strong> and <strong>CHANNEL</strong> variable should be set to the user name of the Twitch account you created for your bot, and the channel you want it to connect to,
+i.e. your own Twitch user name.</p>
+
+<p><strong>Note:</strong> It should go without saying, but don’t create a bot and tell it to connect to someone else’s stream chat unless they specifically asked you to. The Twitch IRC
+protocol that this bot makes use of is totally open and would technically allow you to do this because it’s literally the same as joining someone’s chat through
+the Twitch website. But it would be very rude to do this, and you can be banned, and it most certainly violates Twitch’s terms of service to use an automated program
+to send messages in someone’s chat without their permission!</p>
+
+<p>Once you have edited <code class="language-plaintext highlighter-rouge">stream.py</code> to allow your Twitch bot’s account to connect your chat, you can run the program by opening a command prompt window in the folder
+where you cloned/extracted the repository and typing the following command:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">&gt;</span><span class="w"> </span><span class="err">python</span><span class="w"> </span><span class="err">stream.py</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="oauthtoken">oauth.token</h3>
+
+<p>Be sure to create a file for your oauth token (obtainable <a href="https://twitchapps.com/tmi/">here</a>). Simply copy paste the token into the file and save it.</p>
+
+<p><strong><em>REMEMBER TO KEEP THIS TOKEN SECRET!</em></strong></p>
+
+<p>It represents a tokenized form of your authentication with Twitch and the authorization to connect to a Twitch IRC channel (i.e. a “Twitch Chat” for a given user). 
+If you ever accidentally share this token, you can revoke it or generate a new token (rendering the old one invalid) from your
+<a href="https://www.twitch.tv/settings/connections">connection settings page</a> on Twitch.</p>
+
+<h3 id="bot_settingsjson"><strong>bot_settings.json</strong></h3>
+
+<p>To define attributes and behaviors for your bot, you’ll need to create a JSON data file and provide some instructions. The following keys can be defined to support
+whatever functionality you want to implement.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"approved_users"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"user_1"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"user_2"</span><span class="p">,</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"restricted"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="err">:command</span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="err">:command</span><span class="mi">2</span><span class="p">,</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"public"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="err">:command</span><span class="mi">3</span><span class="p">,</span><span class="w">
+      </span><span class="err">:command</span><span class="mi">4</span><span class="p">,</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"variable1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"initial value"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"variable2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"some other initial value"</span><span class="p">,</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li><strong>approved_users:</strong> defines user names for users that are allowed
+to use restricted commands</li>
+  <li><strong>restricted:</strong> defines commands that can only be used by approved
+users</li>
+  <li><strong>public:</strong> defines commands that anyone in chat can use</li>
+  <li><strong>state:</strong> defines a set of arbitrary data and variables that can be set or referenced by certain commands</li>
+</ul>
+
+<p>In the example JSON above, you will see I have used <code class="language-plaintext highlighter-rouge">:command1</code> etc. to represent the individual commands that will be defined in this file, but note that
+this is just a shorthand for the JSON specification that will be defined in the following sections.</p>
+
+<p><strong>Note:</strong> Your bot’s state values are not persistent and if the <code class="language-plaintext highlighter-rouge">stream.py</code> process is terminated then upon reconnecting they will go back to the initial
+values as defined in your setting file.</p>
+
+<hr />
+
+<h2 id="defining-commands">Defining Commands</h2>
+
+<p>Commands defined within your JSON data will need to be expressed as an array that contain a series of parameters. This array will always begin by specifying 
+a <code class="language-plaintext highlighter-rouge">CommandClass</code>, then the name of the command, and then any initialization parameters.</p>
+
+<h4 id="parameters-vs-arguments">“Parameters” vs. “Arguments”</h4>
+
+<p>The terms “parameter” and “argument” are often interchangeable, but here I use “parameter” to refer specifically to the “initialization arguments” of the command itself.</p>
+
+<p>In the Python implementation, these are the arguments passed to the <code class="language-plaintext highlighter-rouge">CommandClass.__init__()</code> method when the class object is instantiated. 
+In other words: they are the settings that define what the command actually does.</p>
+
+<p>This usage can be confusing because – like with other Twitch Bots – the command can also be thought of as taking “arguments” when invoked by a user in chat,
+so I will try to be very consistent in using “parameter” and “argument” to mean different things.</p>
+
+<p>A command can be invoked in chat by typing <em>!name</em> and the “arguments” passed to it are just any following words, separated by spaces, 
+i.e.: <em>!name argument1 argument2…</em> and so on.</p>
+
+<p>For example,
+I might have a command that viewers can invoke with <em>!pb</em> to see my current personal best in a given speed game. The user might type <em>!pb alttp</em> to see
+my current personal best in ‘The Legend of Zelda: A Link to the Past.’ In this case, <em>ssb</em> is an “argument” for the command’s usage,
+not the command itself or its definition.</p>
+
+<p>Again, in the Python implementation, this sense of “argument” is passed to the <code class="language-plaintext highlighter-rouge">CommandClass.do()</code> method. If you’re unsure what that means, the important
+point to take away is that <strong>arguments passed to commands by users in chat DO NOT permanently alter the functionality of the command itself.</strong> They only affect
+what it does in that particular instance.</p>
+
+<h3 id="json-specification-for-commands">JSON Specification for Commands</h3>
+
+<p>In the example JSON provided above, the use of <code class="language-plaintext highlighter-rouge">:command1</code> etc. is a shorthand for the following syntax:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">//</span><span class="w"> </span><span class="err">:command</span><span class="w">
+</span><span class="p">[</span><span class="s2">"CommandClass"</span><span class="p">,</span><span class="w"> </span><span class="s2">"command_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"param1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"param2"</span><span class="p">,</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>In JSON terms, this is an array of strings (and in certain cases, other data types) whereby the first string specifies the particular type of command you are defining.
+The second string specifies the name of the command, and the following parameters will depend on the type of command you are defining and what you want it to do.
+The different types of commands are defind in the following section, but first let’s go over:</p>
+
+<h3 id="inner-commands">Inner Commands</h3>
+
+<p>When we get to the specific command types below, you will occasionally see the use of <code class="language-plaintext highlighter-rouge">:inner_command</code> within the list of parameters. Again, this is a shorthand
+for a particular JSON specification, but when defining inner commands this way, the syntax is slightly different and can take one of three forms.</p>
+
+<h4 id="commandname-strings">CommandName Strings</h4>
+
+<p>Inner commands can be defined by simply passing the name of the other command as a string:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">//</span><span class="w"> </span><span class="err">:command</span><span class="w">
+</span><span class="p">[</span><span class="s2">"OuterCommandClass"</span><span class="p">,</span><span class="w"> </span><span class="s2">"outer_command_name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"outer_command_params"</span><span class="p">,</span><span class="err">...</span><span class="w"> 
+  </span><span class="err">//</span><span class="w"> </span><span class="err">:inner_command</span><span class="w">
+  </span><span class="s2">"inner_command_name"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Note</strong>: In this case, do make sure that <code class="language-plaintext highlighter-rouge">inner_command_name</code> is actually defined somewhere in your <code class="language-plaintext highlighter-rouge">bot_settings.json</code> file, otherwise <code class="language-plaintext highlighter-rouge">stream.py</code> 
+will throw an error when trying to initialize your bot.</p>
+
+<h4 id="commandargument-arrays">Command/Argument Arrays</h4>
+
+<p>Inner commands can be invoked by an outer command with a certain set of arguments already specified, like so:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">//</span><span class="w"> </span><span class="err">:command</span><span class="w">
+</span><span class="p">[</span><span class="s2">"OuterCommandClass"</span><span class="p">,</span><span class="w"> </span><span class="s2">"outer_command_name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"outer_command_params"</span><span class="p">,</span><span class="err">...</span><span class="w">
+  </span><span class="err">//</span><span class="w"> </span><span class="err">:inner_command</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"inner_command_name"</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"inner_command_arg1"</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"inner_command_arg2"</span><span class="p">,</span><span class="err">...</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Note</strong>: In addition to ensuring the <code class="language-plaintext highlighter-rouge">inner_command_name</code> is actually defined, notice that the inner command and its arguments are contained
+within their own array. A common mistake I make when creating command sets is forgetting to wrap them in this inner array, which will usually
+cause <code class="language-plaintext highlighter-rouge">stream.py</code> to throw an error and almost certainly won’t give you the right functionality.</p>
+
+<h4 id="anonymous-command-definitions">Anonymous Command Definitions</h4>
+
+<p>The syntax for this type of inner command is exactly the same as the top level list of commands you are defining for your <code class="language-plaintext highlighter-rouge">public</code> and <code class="language-plaintext highlighter-rouge">restricted</code> arrays,
+the only difference being that they are not given a name. Consequently, these commands can’t be invoked on their own and in a sense
+they “belong” to the outer command they are a parameter for.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">//</span><span class="w"> </span><span class="err">:command</span><span class="w">
+</span><span class="p">[</span><span class="s2">"OuterCommandClass"</span><span class="p">,</span><span class="w"> </span><span class="s2">"outer_command_name"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"outer_command_params"</span><span class="p">,</span><span class="err">...</span><span class="w">
+  </span><span class="err">//</span><span class="w"> </span><span class="err">:inner_command</span><span class="w">
+  </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"InnerCommandClass"</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"inner_parameter1"</span><span class="p">,</span><span class="w"> 
+    </span><span class="s2">"inner_parameter2"</span><span class="p">,</span><span class="err">...</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Note:</strong> Unlike the “Command/Argument Array” syntax mentioned above, you can’t specify arguments for this type of inner command, only its initialization parameters.
+If you think about it, this makes sense because this “anonymous” command can’t be invoked anywhere else, so its functionality can’t depend on receiving certain arguments
+when invoked.</p>
+
+<hr />
+
+<h2 id="commandclasses">CommandClasses</h2>
+
+<p>I’ve used the term “<code class="language-plaintext highlighter-rouge">CommandClass</code>” throughout this document to refer to (in Python terms) subclasses of the base class <code class="language-plaintext highlighter-rouge">Comand</code> as defined in <code class="language-plaintext highlighter-rouge">commands.py</code> in the source code. 
+The names of these subclasses (with the CamelCase convention, as listed below) are the literal strings you use to specify what type of command you are creating.</p>
+
+<p>The following subclasses define the types of commands you can create, but as you will see, their combined usage can get quite complicated and powerful
+because of the way they can be joined together and used to invoke each other. We’ll start with the simplest examples and work our way up.</p>
+
+<h3 id="textcommand">TextCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"TextCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"Text for your bot to send to the chat"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The simplest use case, this type of command simply causes your bot to say something to the chat whenever it is invoked.</p>
+
+<h3 id="formatcommand">FormatCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"FormatCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"Formatted text with {variable_interploation}"</span><span class="p">,</span><span class="w"> 
+  </span><span class="err">(optional)</span><span class="w"> </span><span class="p">{</span><span class="nl">"inner_keyword"</span><span class="p">:</span><span class="w"> </span><span class="s2">"some value"</span><span class="p">,</span><span class="err">...</span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Similar to the <code class="language-plaintext highlighter-rouge">TextCommand</code> class, the <code class="language-plaintext highlighter-rouge">FormatCommand</code> supports a type of variable interpolation based on the specification in Python’s
+<code class="language-plaintext highlighter-rouge">str.format()</code> method. The set of variables passed to this formatting method come from the bot’s state variables
+and they can be interpolated into the string by enclosing the variable name in curly brackets like this: <code class="language-plaintext highlighter-rouge">"{variable_name}"</code></p>
+
+<p>An optional final parameter allows for the use of a JSON object that provides additional keyword/value pairs to be interpolated as variables.
+There’s not really a reason to do this explicitly in your <code class="language-plaintext highlighter-rouge">bot_settings.json</code> file, but if used in conjuction with the <code class="language-plaintext highlighter-rouge">GetCommand</code> 
+it allows you to take the response from an external API and format it using values from the JSON that is returned from the GET request.</p>
+
+<p><strong>Note:</strong> These variable interpolations can also support key or index arguments: <code class="language-plaintext highlighter-rouge">{variable[subkey]}</code></p>
+
+<p>For example, if you have a state variable called <code class="language-plaintext highlighter-rouge">list</code> that looks like <code class="language-plaintext highlighter-rouge">["One", "Two", "Three"]</code> then given the formatting parameter <code class="language-plaintext highlighter-rouge">"{list[0]}"</code>
+your bot will send the message <em>One</em> to the chat.</p>
+
+<p>Python’s string formatting method also supports some additional formatting arguments as specified <a href="https://docs.python.org/3/library/string.html#format-specification-mini-language">here.</a>
+This allows for padding, alignment, and some numeric conversion. Bear in mind that in the source code’s implementation,
+the <code class="language-plaintext highlighter-rouge">str.format()</code> method is called with the state variables passed as named keywords, so the <code class="language-plaintext highlighter-rouge">FormatCommand</code> class itself doesn’t
+support the use of positional arguments in this expression syntax.</p>
+
+<h3 id="statecommand">StateCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"StateCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="err">(optional)</span><span class="w"> </span><span class="s2">"key"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">StateCommand</code> sets the value of some state variable to the arguments passed to it.</p>
+
+<p>By default, the name of the command is used as the name for the state variable, but the optional third parameter can be specified 
+so that the command’s name is different from the name of the state variable itself.</p>
+
+<p><strong>Note:</strong> The arguments passed to this command when invoked are concatenated into a single string, so for example,
+the message <em>!variable1 argument1 argument2</em></p>
+
+<h3 id="substatecommand">SubStateCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"SubStateCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"variable_name"</span><span class="p">,</span><span class="w"> </span><span class="s2">"variable_key"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Similar to the <code class="language-plaintext highlighter-rouge">StateCommand</code>, the <code class="language-plaintext highlighter-rouge">SubStateCommand</code> can be used to set the value of some key within an object, or index of an array
+that is stored as a state variable.</p>
+
+<p><strong>Note:</strong> Arrays stored as state variables are zero-indexed, so to return the first value of an array
+the number <code class="language-plaintext highlighter-rouge">0</code> should be used as the final parameter.</p>
+
+<p><strong>Note:</strong> When setting a value by index within an array, you cannot “create” a new array element by accessing an array index that doesn’t exist yet.
+You can, however, set the value of arbitrary keys on a state variable that is defined as a JSON object, should you wish to do so.</p>
+
+<p><strong>Note:</strong> there is no <code class="language-plaintext highlighter-rouge">SubSubStateCommand</code> class, so there is inherently a depth limit for key/index values that can be accessed
+by using any command. Nothing prevents you from storing state variables with more complex nesting, but you should keep this limitation in mind
+when creating state variables.</p>
+
+<h3 id="jsoncommand">JsonCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"JsonCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="p">{</span><span class="nl">"some_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"some value that can be {variable_interpolated}"</span><span class="p">,</span><span class="err">...</span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">JsonCommand</code> class takes a third parameter that should be a JSON object rather than a string. The intended use for this
+<code class="language-plaintext highlighter-rouge">CommandClass</code> is to be able to create a JSON formatted string that can then be passed to a <code class="language-plaintext highlighter-rouge">PostCommand</code> to make up the body of its POST request.</p>
+
+<p>The value for each key within the JSON object can also be interpolated with state variables, just like the FormatCommand class.
+This formatting is performed recursively so strings within nested objects will also be interpolated.</p>
+
+<h3 id="postcommand">PostCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"PostCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"url"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The PostCommand is used to send a POST request to an API endpoint specified by the URL parameter.</p>
+
+<p><strong>Note:</strong> When the <code class="language-plaintext highlighter-rouge">PostCommand</code> is invoked in chat, the arguments passed to it must form a valid JSON serializable string, which is treated as
+the body of the POST request. Because this is error prone and unwieldy, it’s recommended that the <code class="language-plaintext highlighter-rouge">PostCommand</code> be used in conjunction 
+with other commands, typically a <code class="language-plaintext highlighter-rouge">JsonCommand</code> in order to provide a properly fromatted JSON serializable string.</p>
+
+<h3 id="getcommand">GetCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"GetCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"url"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Similar to the <code class="language-plaintext highlighter-rouge">PostCommand</code>, the <code class="language-plaintext highlighter-rouge">GetCommand</code> sends a GET request to an API endpoint specified by the URL parameter and sends the response to chat.</p>
+
+<p>Because most web APIs return data as serialized JSON, it is generally more useful to chain this command with other commands, such as the <code class="language-plaintext highlighter-rouge">FormatCommand</code>,
+similar to the use of <code class="language-plaintext highlighter-rouge">PostCommand</code> in reverse.</p>
+
+<h3 id="aliascommand">AliasCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"AliasCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"other_command"</span><span class="p">,</span><span class="w"> </span><span class="s2">"arg1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"arg2"</span><span class="err">...</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">AliasCommand</code> is used to invoke some other command with a specified set of arguments passed to that other command. 
+They are useful for creating a shorthand for a common command/argument pairs such as typing <em>!ssb</em> to invoke <em>!game Super Smash Bros.</em></p>
+
+<p><strong>Note:</strong> The parameter for the other command to be invoked must be a string and refer to a defined command.
+The “Command/Argument Arrays” and “Anonymous Command Definitions” mentioned in the previous section don’t work here.</p>
+
+<h3 id="chaincommand">ChainCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"ChainCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="s2">"output_command"</span><span class="p">,</span><span class="w"> </span><span class="s2">"input_command"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The ChainCommand is used to pass the “output” (i.e.: any message that would be sent to chat) of one command to the “input” of another
+(i.e.: the arguments that would be passed if the command were invoked in chat).</p>
+
+<p>This command is particularly powerful when combined with <code class="language-plaintext highlighter-rouge">SequenceCommands</code> and <code class="language-plaintext highlighter-rouge">OptionCommands</code>, but another common use case would be
+to chain the output of a <code class="language-plaintext highlighter-rouge">JsonCommand</code> to the input of a PostCommand in order to, for example, use a set of state variables to make up
+the body of a POST request for an external API.</p>
+
+<p><strong>Note:</strong> The parameters for the output and input commands must be strings referring to defined commands.
+The “Command/Argument Arrays” and “Anonymous Command Definitions” mentioned in the previous section don’t work here.</p>
+
+<h3 id="sequencecommand">SequenceCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"SequenceCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="err">:inner_command</span><span class="mi">1</span><span class="p">,</span><span class="w"> 
+  </span><span class="err">:inner_command</span><span class="mi">2</span><span class="err">...</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">SequenceCommand</code> will invoke a series of other commands, passing any arguments it receives to each command in the series it invokes.</p>
+
+<p><strong>Note:</strong> Any inner commands defined here with a specified set of arguments will have those arguments passed to it <strong>before</strong> the arguments
+from the chat when the SequenceCommand is invoked.</p>
+
+<p>So for example, if I define a <code class="language-plaintext highlighter-rouge">SequenceCommand</code> as follows:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"SequenceCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"sequence"</span><span class="p">,</span><span class="w"> 
+  </span><span class="p">[</span><span class="s2">"inner_command"</span><span class="p">,</span><span class="w"> </span><span class="s2">"inner_arg1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"inner_arg2"</span><span class="p">]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>I could invoke it in chat with the message:</p>
+
+<p><em>!sequence outer_arg1 outer_arg2</em></p>
+
+<p>The inner command will then be invoked as if the following message was sent in chat:</p>
+
+<p><em>!inner_command inner_arg1 inner_arg2 outer_arg1 outer_arg2</em></p>
+
+<h3 id="optioncommand">OptionCommand</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"OptionCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w"> 
+  </span><span class="p">[</span><span class="s2">"option1"</span><span class="p">,</span><span class="w"> </span><span class="err">:inner_command</span><span class="mi">1</span><span class="p">],</span><span class="w"> 
+  </span><span class="p">[</span><span class="s2">"option2"</span><span class="p">,</span><span class="w"> </span><span class="err">:inner_command</span><span class="mi">2</span><span class="p">]</span><span class="err">...</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">OptionCommand</code> takes some argument and uses it to determine which from a series of other commands to invoke, 
+passing all additional arguments after the first one to that inner command.</p>
+
+<p><strong>Note:</strong> The same rules apply for passing outer vs. inner arguments as with <strong>SequenceCommand</strong> except that here,
+the first argument passed to the <code class="language-plaintext highlighter-rouge">OptionCommand</code> is not included.</p>
+
+<p>So for example, I could define an <code class="language-plaintext highlighter-rouge">OptionCommand</code> as follows:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s2">"OptionCommand"</span><span class="p">,</span><span class="w"> </span><span class="s2">"option"</span><span class="p">,</span><span class="w">
+  </span><span class="p">[</span><span class="s2">"choice1"</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">"inner_command"</span><span class="p">,</span><span class="w"> </span><span class="s2">"inner_arg1"</span><span class="p">]],</span><span class="w">
+  </span><span class="p">[</span><span class="s2">"choice2"</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">"inner_command"</span><span class="p">,</span><span class="w"> </span><span class="s2">"inner_arg2"</span><span class="p">]]</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It could then be invoked in chat by sending:</p>
+
+<p><em>!option choice1 outer_arg</em></p>
+
+<p>Which would be the same as sending the message:</p>
+
+<p><em>!inner_command inner_arg1 outer_arg</em></p>
+
+<p><strong>Note:</strong> Each of the option parameters is itself an array, so when used in conjunction with “Command/Argument Arrays” and “Anonymous Command Definitions”
+each option will be an array with a string for each choice representing the first item and then an additional array as the second item.
+A common pitfall is forgetting to enclose an anonymous command, for example, in its own array.</p>
+
+    </content>
+
+</body>
+
+</html>
